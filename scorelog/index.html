@@ -7,456 +7,944 @@
     <meta name="description" content="ScoreLog is the ultimate score keeping app for board games, card games, and sports. Track scores for up to 20 players with 6 game modes, tournaments, live multiplayer, and more.">
     <meta property="og:title" content="ScoreLog - Score Keeper for Any Game">
     <meta property="og:description" content="Track scores for any board game, card game, or sport. 6 game modes, tournaments, live multiplayer, themes, and player stats.">
-    <meta property="og:image" content="https://bramzz.github.io/assets/feature-graphic.png">
-    <meta property="og:url" content="https://bramzz.github.io">
+    <meta property="og:image" content="https://bramzz.github.io/scorelog/assets/feature-graphic.png">
+    <meta property="og:url" content="https://bramzz.github.io/scorelog">
     <meta name="twitter:card" content="summary_large_image">
     <link rel="icon" type="image/png" href="assets/icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Noto+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            /* Classic Dark theme — exact app colors */
+            --primary: #FBBF24;
+            --secondary: #F59E0B;
+            --highlight: #FCD34D;
+            --bg: #1C1917;
+            --bg-deep: #0C0A09;
+            --card: #292524;
+            --card-sep: #44403C;
+            --border: #44403C;
+            --text: #FEF3C7;
+            --label: #D6D3D1;
+            --gray: #A8A29E;
+            --muted: #78716C;
+            --red: #F87171;
+            --green: #34D399;
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            color: #FEF3C7;
-            background: #1C1917;
+            font-family: 'Noto Sans', sans-serif;
+            color: var(--text);
+            background: var(--bg);
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
         }
 
-        /* Hero */
-        .hero {
-            background: linear-gradient(135deg, #292524 0%, #1C1917 100%);
-            color: #FEF3C7;
-            padding: 80px 24px 60px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle at 30% 70%, rgba(251, 191, 36, 0.08) 0%, transparent 50%);
+        /* ── Grain texture ── */
+        .grain {
+            position: fixed;
+            inset: 0;
             pointer-events: none;
+            z-index: 9999;
+            opacity: 0.035;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            background-size: 256px;
         }
 
-        .hero-content {
-            max-width: 800px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 1;
+        /* ── Reveal ── */
+        .r { opacity: 0; transform: translateY(40px); transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1); }
+        .r.v { opacity: 1; transform: none; }
+        .r.v .d1 { transition-delay: 0.1s; }
+        .r.v .d2 { transition-delay: 0.2s; }
+        .r.v .d3 { transition-delay: 0.3s; }
+        .r.v .d4 { transition-delay: 0.4s; }
+        .r.v .d5 { transition-delay: 0.5s; }
+
+        /* ════════════════════════════════════════
+           NAV
+        ════════════════════════════════════════ */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: background 0.3s, backdrop-filter 0.3s;
         }
 
-        .app-icon {
-            width: 100px;
-            height: 100px;
-            border-radius: 22px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-            margin-bottom: 24px;
+        nav.scrolled {
+            background: rgba(28, 25, 23, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(68, 64, 60, 0.4);
         }
 
-        .hero h1 {
-            font-size: 2.8rem;
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text);
+        }
+
+        .nav-brand img {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+        }
+
+        .nav-brand span {
+            font-family: 'Plus Jakarta Sans', sans-serif;
             font-weight: 800;
-            margin-bottom: 8px;
+            font-size: 1.15rem;
             letter-spacing: -0.5px;
         }
 
-        .hero .tagline {
-            font-size: 1.25rem;
-            opacity: 0.9;
-            margin-bottom: 32px;
-            font-weight: 400;
+        .nav-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--primary);
+            color: var(--bg-deep);
+            font-weight: 600;
+            font-size: 0.85rem;
+            padding: 10px 20px;
+            border-radius: 100px;
+            text-decoration: none;
+            transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s;
         }
 
-        .store-badge {
-            display: inline-block;
-            transition: transform 0.2s ease;
+        .nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(251, 191, 36, 0.3);
         }
 
-        .store-badge:hover {
-            transform: scale(1.05);
-        }
+        .nav-cta svg { width: 16px; height: 16px; }
 
-        .store-badge img {
-            height: 60px;
-        }
-
-        /* Screenshots carousel */
-        .screenshots-section {
-            padding: 60px 24px;
-            background: #242120;
-        }
-
-        .screenshots-section h2 {
-            text-align: center;
-            font-size: 1.8rem;
-            color: #FBBF24;
-            margin-bottom: 36px;
-        }
-
-        .screenshots-wrapper {
+        /* ════════════════════════════════════════
+           HERO
+        ════════════════════════════════════════ */
+        .hero {
             position: relative;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .screenshots-scroll {
+            min-height: 100vh;
             display: flex;
-            gap: 20px;
-            overflow-x: auto;
-            scroll-snap-type: x mandatory;
-            scroll-behavior: smooth;
-            padding: 0 24px 20px;
-            -webkit-overflow-scrolling: touch;
-            cursor: grab;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 140px 24px 80px;
+            overflow: hidden;
+            text-align: center;
         }
 
-        .screenshots-scroll.grabbing {
-            cursor: grabbing;
-            scroll-behavior: auto;
-            scroll-snap-type: none;
-        }
-
-        .screenshots-scroll::-webkit-scrollbar {
-            height: 6px;
-        }
-
-        .screenshots-scroll::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .screenshots-scroll::-webkit-scrollbar-thumb {
-            background: #44403C;
-            border-radius: 3px;
-        }
-
-        .carousel-btn {
+        /* Warm amber glow — game night lamplight */
+        .hero-glow {
             position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 44px;
-            height: 44px;
+            width: 600px;
+            height: 600px;
             border-radius: 50%;
-            border: 1px solid #44403C;
-            background: #292524;
-            color: #FBBF24;
-            font-size: 1.2rem;
-            cursor: pointer;
+            background: radial-gradient(circle, rgba(251, 191, 36, 0.18), transparent 70%);
+            top: 30%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            filter: blur(60px);
+            pointer-events: none;
+            animation: glowPulse 6s ease-in-out infinite alternate;
+        }
+
+        .hero-glow-2 {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(245, 158, 11, 0.1), transparent 70%);
+            bottom: 10%;
+            right: 10%;
+            filter: blur(80px);
+            pointer-events: none;
+            animation: glowPulse 8s ease-in-out 2s infinite alternate;
+        }
+
+        @keyframes glowPulse {
+            0% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+        }
+
+        /* Floating score numbers */
+        .hero-scores {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .hero-scores span {
+            position: absolute;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 800;
+            color: var(--primary);
+            opacity: 0.04;
+            user-select: none;
+        }
+
+        .hero-content {
+            position: relative;
             z-index: 2;
+            max-width: 680px;
+        }
+
+        .app-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px -12px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.06);
+            margin-bottom: 24px;
+            animation: fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.1s both;
+        }
+
+        .hero h1 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: clamp(3.2rem, 9vw, 5.5rem);
+            font-weight: 800;
+            letter-spacing: -2px;
+            line-height: 1;
+            margin-bottom: 16px;
+            white-space: nowrap;
+            animation: fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.2s both;
+        }
+
+        .hero h1 .t-white {
+            color: #FFFFFF;
+        }
+        .hero h1 .t-gold {
+            color: var(--primary);
+        }
+
+        .hero-sub {
+            font-size: clamp(1rem, 2vw, 1.15rem);
+            color: var(--gray);
+            font-weight: 400;
+            max-width: 400px;
+            margin: 0 auto 32px;
+            line-height: 1.65;
+            animation: fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.3s both;
+        }
+
+        .hero-actions {
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.2s, border-color 0.2s;
+            gap: 16px;
+            animation: fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.4s both;
         }
 
-        .carousel-btn:hover {
-            background: #3A3736;
-            border-color: #FBBF24;
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--primary);
+            color: var(--bg-deep);
+            font-family: 'Noto Sans', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 16px 32px;
+            border-radius: 14px;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+            box-shadow: 0 4px 16px rgba(251, 191, 36, 0.2);
         }
 
-        .carousel-btn.prev { left: -8px; }
-        .carousel-btn.next { right: -8px; }
-
-        .screenshot-item {
-            flex: 0 0 auto;
-            scroll-snap-align: center;
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(251, 191, 36, 0.35);
         }
 
-        .screenshot-item img {
-            height: 480px;
-            border-radius: 16px;
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+        .btn-primary svg { width: 20px; height: 20px; }
+
+        .btn-ghost {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--label);
+            font-weight: 500;
+            font-size: 0.95rem;
+            text-decoration: none;
+            padding: 16px 24px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .btn-ghost:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: none; }
+        }
+
+        /* Scroll indicator */
+        .scroll-hint {
+            position: absolute;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            color: var(--muted);
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            animation: fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.6s both;
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 32px;
+            background: linear-gradient(to bottom, var(--primary), transparent);
+            animation: scrollLine 2s ease-in-out infinite;
+        }
+
+        @keyframes scrollLine {
+            0%, 100% { opacity: 0.3; transform: scaleY(0.5); }
+            50% { opacity: 1; transform: scaleY(1); }
+        }
+
+        /* ════════════════════════════════════════
+           SCREENSHOTS
+        ════════════════════════════════════════ */
+        .screenshots {
+            position: relative;
+            padding: 120px 0;
+            background: var(--bg-deep);
+        }
+
+        /* Diagonal divider top */
+        .screenshots::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: var(--bg);
+            clip-path: polygon(0 0, 100% 0, 100% 20%, 0 100%);
+        }
+
+        .section-header {
+            text-align: center;
+            padding: 0 24px;
+            margin-bottom: 56px;
+        }
+
+        .section-tag {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: var(--secondary);
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            line-height: 1.1;
+        }
+
+        .masonry {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .masonry-col {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Offset the right column down for stagger effect */
+        .masonry-col:nth-child(2) {
+            padding-top: 80px;
+        }
+
+        .ss-card {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            background: var(--card);
+            box-shadow: 0 8px 32px -8px rgba(0,0,0,0.5);
+            transition: transform 0.5s cubic-bezier(0.16,1,0.3,1), box-shadow 0.5s;
+        }
+
+        .ss-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 24px 48px -12px rgba(0,0,0,0.6), 0 0 0 1px rgba(251, 191, 36, 0.12);
+        }
+
+        .ss-card img {
+            width: 100%;
+            display: block;
+        }
+
+        /* Subtle shine overlay */
+        .ss-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(160deg, rgba(255,255,255,0.05) 0%, transparent 40%);
             pointer-events: none;
         }
 
-        /* Features */
+        /* Caption label */
+        .ss-label {
+            position: absolute;
+            bottom: 16px;
+            left: 16px;
+            background: rgba(12, 10, 9, 0.75);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 8px 14px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--label);
+            z-index: 2;
+            opacity: 0;
+            transform: translateY(6px);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        .ss-card:hover .ss-label {
+            opacity: 1;
+            transform: none;
+        }
+
+        /* ════════════════════════════════════════
+           FEATURES
+        ════════════════════════════════════════ */
         .features {
-            padding: 80px 24px;
-            max-width: 1000px;
+            padding: 120px 24px;
+            max-width: 1080px;
             margin: 0 auto;
         }
 
-        .features h2 {
-            text-align: center;
-            font-size: 1.8rem;
-            color: #FBBF24;
-            margin-bottom: 48px;
-        }
-
-        .features-grid {
+        .feat-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 32px;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 16px;
         }
 
-        .feature-card {
-            background: #292524;
-            border: 1px solid #44403C;
-            border-radius: 16px;
-            padding: 28px;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        .feat {
+            position: relative;
+            background: var(--card);
+            border: 1px solid rgba(68, 64, 60, 0.5);
+            border-radius: 20px;
+            padding: 32px 28px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
         }
 
-        .feature-card:hover {
+        .feat:hover {
+            border-color: rgba(251, 191, 36, 0.2);
             transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-            border-color: #FBBF24;
+            box-shadow: 0 24px 48px -16px rgba(0,0,0,0.5);
         }
 
-        .feature-icon {
-            font-size: 2rem;
-            margin-bottom: 12px;
+        /* Big number watermark */
+        .feat-big {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: -4px;
+            position: absolute;
+            right: 20px;
+            top: 16px;
+            pointer-events: none;
+            user-select: none;
         }
 
-        .feature-card h3 {
-            font-size: 1.15rem;
-            margin-bottom: 8px;
-            color: #FEF3C7;
+        .feat-emoji {
+            font-size: 2.2rem;
+            margin-bottom: 16px;
+            display: block;
+            filter: saturate(0.85);
         }
 
-        .feature-card p {
-            font-size: 0.95rem;
-            color: #A8A29E;
-            line-height: 1.5;
+        .feat h3 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            letter-spacing: -0.3px;
+            position: relative;
         }
 
-        /* Pro */
-        .pro-section {
-            background: linear-gradient(135deg, #0C0A09 0%, #1C1917 100%);
-            color: #FEF3C7;
-            padding: 80px 24px;
+        .feat p {
+            font-size: 0.9rem;
+            color: var(--gray);
+            line-height: 1.6;
+            font-weight: 400;
+            position: relative;
+        }
+
+        /* ── Card: Score Any Game — full row hero ── */
+        .feat-hero {
+            grid-column: 1 / -1;
+            padding: 40px 36px;
+            min-height: 200px;
+            background:
+                radial-gradient(ellipse at 80% 50%, rgba(251, 191, 36, 0.06), transparent 60%),
+                var(--card);
+        }
+        .feat-hero .feat-big {
+            font-size: 8rem;
+            color: var(--primary);
+            opacity: 0.07;
+            top: 50%;
+            transform: translateY(-50%);
+            right: 36px;
+        }
+        .feat-hero .feat-emoji { font-size: 2.8rem; }
+        .feat-hero h3 { font-size: 1.5rem; }
+        .feat-hero p { max-width: 480px; font-size: 1rem; }
+
+        /* ── Medium cards — half row ── */
+        .feat-md {
+            grid-column: span 6;
+            min-height: 180px;
+        }
+        .feat-md .feat-big {
+            font-size: 5rem;
+            opacity: 0.06;
+        }
+
+        /* ── Small cards — third row ── */
+        .feat-sm {
+            grid-column: span 4;
+            min-height: 170px;
+        }
+        .feat-sm .feat-big {
+            font-size: 4.5rem;
+            opacity: 0.06;
+        }
+
+        /* Color accents per card */
+        .feat-c1 .feat-big { color: var(--primary); }
+        .feat-c2 .feat-big { color: var(--red); }
+        .feat-c2:hover { border-color: rgba(248, 113, 113, 0.2); }
+        .feat-c3 .feat-big { color: var(--green); }
+        .feat-c3:hover { border-color: rgba(52, 211, 153, 0.2); }
+        .feat-c4 .feat-big { color: #38BDF8; }
+        .feat-c4:hover { border-color: rgba(56, 189, 248, 0.2); }
+        .feat-c5 .feat-big { color: #A78BFA; }
+        .feat-c5:hover { border-color: rgba(167, 139, 250, 0.2); }
+        .feat-c6 .feat-big { color: #FB923C; }
+        .feat-c6:hover { border-color: rgba(251, 146, 60, 0.2); }
+
+        /* ════════════════════════════════════════
+           PRO
+        ════════════════════════════════════════ */
+        .pro {
+            position: relative;
+            padding: 120px 24px;
             text-align: center;
+            overflow: hidden;
         }
 
-        .pro-section h2 {
-            font-size: 1.8rem;
+        /* Dramatic amber gradient background */
+        .pro-bg {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 70% 60% at 50% 40%, rgba(251, 191, 36, 0.08), transparent),
+                radial-gradient(ellipse 50% 40% at 70% 80%, rgba(245, 158, 11, 0.06), transparent),
+                var(--bg);
+            pointer-events: none;
+        }
+
+        /* Decorative border lines */
+        .pro::before, .pro::after {
+            content: '';
+            position: absolute;
+            left: 10%;
+            right: 10%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border), transparent);
+        }
+        .pro::before { top: 0; }
+        .pro::after { bottom: 0; }
+
+        .pro-content {
+            position: relative;
+            z-index: 1;
+            max-width: 640px;
+            margin: 0 auto;
+        }
+
+        .pro-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            color: var(--bg-deep);
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2.5px;
+            padding: 8px 20px;
+            border-radius: 100px;
+            margin-bottom: 28px;
+        }
+
+        .pro .section-title {
             margin-bottom: 12px;
         }
 
-        .pro-section h2 span {
-            color: #FBBF24;
-        }
+        .pro .section-title .t-white { color: #FFFFFF; }
+        .pro .section-title .t-gold { color: var(--primary); }
 
-        .pro-section .subtitle {
-            opacity: 0.7;
-            margin-bottom: 40px;
+        .pro-sub {
+            color: var(--gray);
             font-size: 1.05rem;
+            font-weight: 300;
+            margin-bottom: 44px;
         }
 
-        .pro-features {
+        .pro-grid {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 16px;
-            max-width: 700px;
-            margin: 0 auto;
+            gap: 10px;
+            margin-bottom: 48px;
         }
 
-        .pro-tag {
-            background: rgba(251, 191, 36, 0.1);
-            border: 1px solid rgba(251, 191, 36, 0.25);
-            border-radius: 100px;
-            padding: 10px 20px;
-            font-size: 0.95rem;
-            color: #FCD34D;
+        .pro-chip {
+            background: rgba(251, 191, 36, 0.06);
+            border: 1px solid rgba(251, 191, 36, 0.15);
+            border-radius: 12px;
+            padding: 14px 22px;
+            font-size: 0.92rem;
+            color: var(--highlight);
+            font-weight: 500;
+            transition: all 0.3s;
         }
 
-        /* Footer */
+        .pro-chip:hover {
+            background: rgba(251, 191, 36, 0.12);
+            border-color: rgba(251, 191, 36, 0.35);
+            transform: translateY(-2px);
+        }
+
+        /* ════════════════════════════════════════
+           FOOTER
+        ════════════════════════════════════════ */
         footer {
-            background: #0C0A09;
-            color: #A8A29E;
+            border-top: 1px solid rgba(68, 64, 60, 0.3);
             padding: 40px 24px;
-            text-align: center;
-            font-size: 0.9rem;
-            border-top: 1px solid #44403C;
-        }
-
-        footer a {
-            color: #D6D3D1;
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-
-        footer a:hover {
-            color: #FBBF24;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1080px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+            gap: 16px;
         }
 
         .footer-links {
             display: flex;
-            justify-content: center;
-            gap: 24px;
-            margin-bottom: 16px;
+            gap: 28px;
             flex-wrap: wrap;
         }
 
-        /* Responsive */
+        footer a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 400;
+            transition: color 0.2s;
+        }
+
+        footer a:hover { color: var(--primary); }
+
+        .footer-copy {
+            font-size: 0.78rem;
+            color: rgba(120, 113, 108, 0.5);
+        }
+
+        /* ════════════════════════════════════════
+           RESPONSIVE
+        ════════════════════════════════════════ */
+        @media (max-width: 900px) {
+            .feat-grid { grid-template-columns: repeat(2, 1fr); }
+            .feat-hero, .feat-md, .feat-sm { grid-column: span 1; }
+            .feat-hero { grid-column: span 2; }
+        }
+
         @media (max-width: 640px) {
-            .hero {
-                padding: 60px 20px 48px;
-            }
+            nav { padding: 12px 16px; }
+            .nav-brand span { display: none; }
 
-            .hero h1 {
-                font-size: 2rem;
-            }
+            .hero { min-height: auto; padding: 100px 20px 48px; }
+            .hero h1 { font-size: 3.2rem; letter-spacing: -1.5px; white-space: normal; }
+            .hero-sub { font-size: 0.95rem; margin-bottom: 28px; }
+            .hero-actions { flex-direction: column; gap: 12px; width: 100%; }
+            .btn-primary, .btn-ghost { width: 100%; justify-content: center; }
+            .hero-glow { width: 350px; height: 350px; }
+            .scroll-hint { display: none; }
 
-            .hero .tagline {
-                font-size: 1.05rem;
-            }
+            .screenshots { padding: 64px 0; }
+            .screenshots::before { height: 40px; }
+            .masonry { grid-template-columns: 1fr; gap: 16px; padding: 0 20px; }
+            .masonry-col { gap: 16px; }
+            .masonry-col:nth-child(2) { padding-top: 0; }
+            .ss-label { opacity: 1; transform: none; }
 
-            .screenshot-item img {
-                height: 380px;
-            }
+            .features { padding: 64px 16px; }
+            .feat-grid { grid-template-columns: 1fr; }
+            .feat-hero, .feat-md, .feat-sm { grid-column: span 1; min-height: auto; }
+            .feat { padding: 24px 20px; }
+            .feat-big { font-size: 3.5rem !important; }
+            .feat-hero .feat-big { font-size: 5rem !important; }
 
-            .features-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
+            .pro { padding: 64px 20px; }
+            .pro-grid { gap: 8px; }
+            .pro-chip { padding: 10px 16px; font-size: 0.85rem; }
 
-            .carousel-btn {
-                display: none;
-            }
+            footer { flex-direction: column; text-align: center; padding: 32px 20px; }
+            .footer-links { justify-content: center; gap: 20px; }
         }
     </style>
 </head>
 <body>
+<div class="grain"></div>
 
-    <!-- Hero -->
-    <section class="hero">
-        <div class="hero-content">
-            <img src="assets/icon.png" alt="ScoreLog icon" class="app-icon">
-            <h1>ScoreLog</h1>
-            <p class="tagline">The ultimate score keeper for any game</p>
-            <a href="https://play.google.com/store/apps/details?id=com.bramzz.ScoreLog" class="store-badge">
-                <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play">
+<!-- ════ Nav ════ -->
+<nav id="nav">
+    <a href="#" class="nav-brand">
+        <img src="assets/icon.png" alt="ScoreLog">
+        <span>ScoreLog</span>
+    </a>
+    <a href="https://play.google.com/store/apps/details?id=com.bramzz.ScoreLog" class="nav-cta">
+        <svg viewBox="0 0 24 24" width="14" height="14"><path fill="black" opacity=".75" d="M3.06 1.64C2.73 1.98 2.54 2.5 2.54 3.18v17.64c0 .68.19 1.2.52 1.54l.08.08L14.08 12v-.24L3.14 1.56l-.08.08z"/><path fill="black" opacity=".55" d="M17.72 15.65L14.08 12v-.24l3.64-3.65.08.05 4.32 2.46c1.23.7 1.23 1.84 0 2.54l-4.32 2.46-.08.03z"/><path fill="black" opacity=".6" d="M17.8 15.62L14.08 11.88 3.06 22.36c.41.43 1.08.48 1.85.05l12.89-6.79z"/><path fill="black" opacity=".8" d="M17.8 8.14L4.91 1.35C4.14.92 3.47.97 3.06 1.4l11.02 10.48 3.72-3.74z"/></svg>
+        Get the app
+    </a>
+</nav>
+
+<!-- ════ Hero ════ -->
+<section class="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-glow-2"></div>
+    <div class="hero-scores" id="heroScores"></div>
+
+    <div class="hero-content">
+        <img src="assets/icon.png" alt="ScoreLog" class="app-icon">
+        <h1><span class="t-white">Score</span><span class="t-gold">Log</span></h1>
+        <p class="hero-sub">The score keeper that does justice to your game nights. Track any game, run tournaments, play live.</p>
+        <div class="hero-actions">
+            <a href="https://play.google.com/store/apps/details?id=com.bramzz.ScoreLog" class="btn-primary">
+                <svg viewBox="0 0 24 24" width="18" height="18"><path fill="black" opacity=".75" d="M3.06 1.64C2.73 1.98 2.54 2.5 2.54 3.18v17.64c0 .68.19 1.2.52 1.54l.08.08L14.08 12v-.24L3.14 1.56l-.08.08z"/><path fill="black" opacity=".55" d="M17.72 15.65L14.08 12v-.24l3.64-3.65.08.05 4.32 2.46c1.23.7 1.23 1.84 0 2.54l-4.32 2.46-.08.03z"/><path fill="black" opacity=".6" d="M17.8 15.62L14.08 11.88 3.06 22.36c.41.43 1.08.48 1.85.05l12.89-6.79z"/><path fill="black" opacity=".8" d="M17.8 8.14L4.91 1.35C4.14.92 3.47.97 3.06 1.4l11.02 10.48 3.72-3.74z"/></svg>
+                Download for Android
             </a>
+            <a href="#features" class="btn-ghost">See features</a>
         </div>
-    </section>
+    </div>
 
-    <!-- Screenshots -->
-    <section class="screenshots-section">
-        <h2>See it in action</h2>
-        <div class="screenshots-wrapper">
-            <button class="carousel-btn prev" aria-label="Previous">&#8249;</button>
-            <div class="screenshots-scroll" id="screenshotsScroll">
-                <div class="screenshot-item"><img src="assets/1-score-any-game.png" alt="Score any game" loading="lazy"></div>
-                <div class="screenshot-item"><img src="assets/2-game-modes.png" alt="6 game modes" loading="lazy"></div>
-                <div class="screenshot-item"><img src="assets/3-smart-scorecards.png" alt="Smart scorecards" loading="lazy"></div>
-                <div class="screenshot-item"><img src="assets/4-tournaments.png" alt="Tournaments" loading="lazy"></div>
-                <div class="screenshot-item"><img src="assets/6-play-together.png" alt="Live multiplayer" loading="lazy"></div>
-                <div class="screenshot-item"><img src="assets/7-themes.png" alt="Themes" loading="lazy"></div>
-                <div class="screenshot-item"><img src="assets/8-player-stats.png" alt="Player stats" loading="lazy"></div>
-            </div>
-            <button class="carousel-btn next" aria-label="Next">&#8250;</button>
+    <div class="scroll-hint">
+        <div class="scroll-line"></div>
+        scroll
+    </div>
+</section>
+
+<!-- ════ Screenshots ════ -->
+<section class="screenshots">
+    <div class="section-header r">
+        <div class="section-tag">Preview</div>
+        <h2 class="section-title">See it in action</h2>
+    </div>
+    <div class="masonry">
+        <div class="masonry-col">
+            <div class="ss-card r"><img src="assets/1-score-any-game.png" alt="Score any game" loading="lazy"><span class="ss-label">Score any game</span></div>
+            <div class="ss-card r"><img src="assets/3-smart-scorecards.png" alt="Smart scorecards" loading="lazy"><span class="ss-label">Smart scorecards</span></div>
+            <div class="ss-card r"><img src="assets/6-play-together.png" alt="Live multiplayer" loading="lazy"><span class="ss-label">Live multiplayer</span></div>
+            <div class="ss-card r"><img src="assets/8-player-stats.png" alt="Player stats" loading="lazy"><span class="ss-label">Player stats</span></div>
         </div>
-    </section>
-
-    <!-- Features -->
-    <section class="features">
-        <h2>Everything you need to keep score</h2>
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">&#127922;</div>
-                <h3>Score Any Game</h3>
-                <p>Track scores for board games, card games, dice games, and sports with up to 20 players.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">&#127919;</div>
-                <h3>6 Game Modes</h3>
-                <p>Dedicated scorecards for Yahtzee, Bowling, Darts, UNO, and Spades with game-specific rules and validation.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">&#127942;</div>
-                <h3>Tournaments</h3>
-                <p>Run series with cumulative standings or single-elimination brackets for competitive game nights.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">&#128225;</div>
-                <h3>Live Multiplayer</h3>
-                <p>Play together in real-time. One device hosts, others join — scores sync instantly across all players.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">&#127912;</div>
-                <h3>10 Themes</h3>
-                <p>Personalize your experience with 10 beautiful color themes, including light and dark modes.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">&#128202;</div>
-                <h3>Player Stats</h3>
-                <p>Track performance over time with detailed statistics, win rates, and game history for every player.</p>
-            </div>
+        <div class="masonry-col">
+            <div class="ss-card r"><img src="assets/2-game-modes.png" alt="6 game modes" loading="lazy"><span class="ss-label">6 game modes</span></div>
+            <div class="ss-card r"><img src="assets/4-tournaments.png" alt="Tournaments" loading="lazy"><span class="ss-label">Tournaments</span></div>
+            <div class="ss-card r"><img src="assets/7-themes.png" alt="Themes" loading="lazy"><span class="ss-label">10 themes</span></div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- Pro -->
-    <section class="pro-section">
-        <h2>Unlock <span>ScoreLog Pro</span></h2>
-        <p class="subtitle">One-time purchase. No subscriptions. All future updates included.</p>
-        <div class="pro-features">
-            <span class="pro-tag">Remove all ads</span>
-            <span class="pro-tag">5 extra game modes</span>
-            <span class="pro-tag">Tournament mode</span>
-            <span class="pro-tag">Host live games</span>
-            <span class="pro-tag">8 extra themes</span>
-            <span class="pro-tag">Support the developer</span>
+<!-- ════ Features ════ -->
+<section class="features" id="features">
+    <div class="section-header r">
+        <div class="section-tag">Features</div>
+        <h2 class="section-title">Everything you need<br>to keep score</h2>
+    </div>
+    <div class="feat-grid r">
+        <!-- Hero card — full width -->
+        <div class="feat feat-hero feat-c1">
+            <span class="feat-big">20</span>
+            <span class="feat-emoji">&#127922;</span>
+            <h3>Score Any Game</h3>
+            <p>Board games, card games, dice games, sports — track scores for up to 20 players with a scorecard that adapts to any game.</p>
         </div>
-    </section>
 
-    <!-- Footer -->
-    <footer>
-        <div class="footer-links">
-            <a href="privacy-policy.html">Privacy Policy</a>
-            <a href="https://play.google.com/store/apps/details?id=com.bramzz.ScoreLog">Google Play</a>
-            <a href="mailto:bram.de.greef@hotmail.com">Contact</a>
+        <!-- Row 2 — two halves -->
+        <div class="feat feat-md feat-c2">
+            <span class="feat-big">6</span>
+            <span class="feat-emoji">&#127919;</span>
+            <h3>6 Game Modes</h3>
+            <p>Dedicated scorecards for Yahtzee, Bowling, Darts, UNO, and Spades — with built-in rules and validation.</p>
         </div>
-        <p>&copy; 2026 Bramzz. All rights reserved.</p>
-    </footer>
+        <div class="feat feat-md feat-c3">
+            <span class="feat-big">&#9733;</span>
+            <span class="feat-emoji">&#127942;</span>
+            <h3>Tournaments</h3>
+            <p>Run series with cumulative standings or single-elimination brackets for competitive game nights.</p>
+        </div>
 
-    <script>
-    (function() {
-        var scroll = document.getElementById('screenshotsScroll');
-        var prevBtn = document.querySelector('.carousel-btn.prev');
-        var nextBtn = document.querySelector('.carousel-btn.next');
-        var scrollAmount = 260;
+        <!-- Row 3 — three thirds -->
+        <div class="feat feat-sm feat-c4">
+            <span class="feat-big">LIVE</span>
+            <span class="feat-emoji">&#128225;</span>
+            <h3>Live Multiplayer</h3>
+            <p>Host a game, others join — scores sync in real-time across all devices.</p>
+        </div>
+        <div class="feat feat-sm feat-c5">
+            <span class="feat-big">10</span>
+            <span class="feat-emoji">&#127912;</span>
+            <h3>10 Themes</h3>
+            <p>From warm amber to icy arctic — with light and dark modes.</p>
+        </div>
+        <div class="feat feat-sm feat-c6">
+            <span class="feat-big">&#8734;</span>
+            <span class="feat-emoji">&#128202;</span>
+            <h3>Player Stats</h3>
+            <p>Win rates, averages, and complete game history for every player.</p>
+        </div>
+    </div>
+</section>
 
-        prevBtn.addEventListener('click', function() {
-            scroll.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-        });
-        nextBtn.addEventListener('click', function() {
-            scroll.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-        });
+<!-- ════ Pro ════ -->
+<section class="pro">
+    <div class="pro-bg"></div>
+    <div class="pro-content r">
+        <div class="pro-badge">&#9733; One-time purchase</div>
+        <h2 class="section-title">Unlock <span class="t-white">Score</span><span class="t-gold">Log</span> Pro</h2>
+        <p class="pro-sub">No subscriptions. All future updates included.</p>
+        <div class="pro-grid">
+            <span class="pro-chip">Remove all ads</span>
+            <span class="pro-chip">5 extra game modes</span>
+            <span class="pro-chip">Tournament mode</span>
+            <span class="pro-chip">Host live games</span>
+            <span class="pro-chip">8 extra themes</span>
+            <span class="pro-chip">Support the developer</span>
+        </div>
+        <a href="https://play.google.com/store/apps/details?id=com.bramzz.ScoreLog" class="btn-primary">
+            <svg viewBox="0 0 24 24" width="18" height="18"><path fill="black" opacity=".75" d="M3.06 1.64C2.73 1.98 2.54 2.5 2.54 3.18v17.64c0 .68.19 1.2.52 1.54l.08.08L14.08 12v-.24L3.14 1.56l-.08.08z"/><path fill="black" opacity=".55" d="M17.72 15.65L14.08 12v-.24l3.64-3.65.08.05 4.32 2.46c1.23.7 1.23 1.84 0 2.54l-4.32 2.46-.08.03z"/><path fill="black" opacity=".6" d="M17.8 15.62L14.08 11.88 3.06 22.36c.41.43 1.08.48 1.85.05l12.89-6.79z"/><path fill="black" opacity=".8" d="M17.8 8.14L4.91 1.35C4.14.92 3.47.97 3.06 1.4l11.02 10.48 3.72-3.74z"/></svg>
+            Get ScoreLog Pro
+        </a>
+    </div>
+</section>
 
-        // Drag to scroll
-        var isDown = false, startX, scrollLeft;
-        scroll.addEventListener('mousedown', function(e) {
-            isDown = true;
-            scroll.classList.add('grabbing');
-            startX = e.pageX - scroll.offsetLeft;
-            scrollLeft = scroll.scrollLeft;
+<!-- ════ Footer ════ -->
+<footer>
+    <div class="footer-links">
+        <a href="privacy-policy.html">Privacy Policy</a>
+        <a href="https://play.google.com/store/apps/details?id=com.bramzz.ScoreLog">Google Play</a>
+        <a href="https://play.google.com/store/apps/developer?id=BDG+Apps&hl=en">All Apps</a>
+        <a href="mailto:bram.de.greef@hotmail.com">Contact</a>
+    </div>
+    <p class="footer-copy">&copy; 2026 BDG Apps</p>
+</footer>
+
+<script>
+(function() {
+    /* ── Nav scroll effect ── */
+    var nav = document.getElementById('nav');
+    var ticking = false;
+    window.addEventListener('scroll', function() {
+        if (!ticking) {
+            requestAnimationFrame(function() {
+                nav.classList.toggle('scrolled', window.scrollY > 40);
+                ticking = false;
+            });
+            ticking = true;
+        }
+    });
+
+    /* ── Floating score numbers in hero ── */
+    var heroScores = document.getElementById('heroScores');
+    var nums = ['7', '10', '21', '42', '100', '-50', '3', '-15', '88', '+5', '300', '-20', '25'];
+    var isMobile = window.innerWidth < 640;
+    var placed = [];
+    nums.forEach(function(n) {
+        var span = document.createElement('span');
+        span.textContent = n;
+        var maxSize = isMobile ? 44 : 120;
+        var minSize = isMobile ? 18 : 40;
+        var size = Math.random() * (maxSize - minSize) + minSize;
+        span.style.fontSize = size + 'px';
+
+        // Try to place without overlapping
+        var attempts = 0, x, y, overlaps;
+        do {
+            x = Math.random() * 90;
+            y = Math.random() * 90;
+            overlaps = false;
+            for (var i = 0; i < placed.length; i++) {
+                var dx = x - placed[i].x;
+                var dy = y - placed[i].y;
+                var minDist = (size + placed[i].s) * 0.06;
+                if (Math.abs(dx) < minDist && Math.abs(dy) < minDist) { overlaps = true; break; }
+            }
+            attempts++;
+        } while (overlaps && attempts < 30);
+
+        placed.push({ x: x, y: y, s: size });
+        span.style.left = x + '%';
+        span.style.top = y + '%';
+        span.style.transform = 'rotate(' + (Math.random() * 40 - 20) + 'deg)';
+        heroScores.appendChild(span);
+    });
+
+    /* ── Scroll reveal ── */
+    var els = document.querySelectorAll('.r');
+    var obs = new IntersectionObserver(function(entries) {
+        entries.forEach(function(e) {
+            if (e.isIntersecting) { e.target.classList.add('v'); obs.unobserve(e.target); }
         });
-        scroll.addEventListener('mouseleave', function() {
-            isDown = false;
-            scroll.classList.remove('grabbing');
-        });
-        scroll.addEventListener('mouseup', function() {
-            isDown = false;
-            scroll.classList.remove('grabbing');
-        });
-        scroll.addEventListener('mousemove', function(e) {
-            if (!isDown) return;
-            e.preventDefault();
-            var x = e.pageX - scroll.offsetLeft;
-            scroll.scrollLeft = scrollLeft - (x - startX);
-        });
-    })();
-    </script>
+    }, { threshold: 0.12 });
+    els.forEach(function(el) { obs.observe(el); });
+
+})();
+</script>
 </body>
 </html>
