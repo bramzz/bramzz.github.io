@@ -20,16 +20,16 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            color: #2D2A26;
-            background: #FAF8F5;
+            color: #FEF3C7;
+            background: #1C1917;
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
         }
 
         /* Hero */
         .hero {
-            background: linear-gradient(135deg, #5B4CDB 0%, #7B6FE0 100%);
-            color: white;
+            background: linear-gradient(135deg, #292524 0%, #1C1917 100%);
+            color: #FEF3C7;
             padding: 80px 24px 60px;
             text-align: center;
             position: relative;
@@ -43,7 +43,7 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle at 30% 70%, rgba(255, 217, 61, 0.1) 0%, transparent 50%);
+            background: radial-gradient(circle at 30% 70%, rgba(251, 191, 36, 0.08) 0%, transparent 50%);
             pointer-events: none;
         }
 
@@ -92,13 +92,13 @@
         /* Screenshots carousel */
         .screenshots-section {
             padding: 60px 24px;
-            background: #F3F0EB;
+            background: #242120;
         }
 
         .screenshots-section h2 {
             text-align: center;
             font-size: 1.8rem;
-            color: #5B4CDB;
+            color: #FBBF24;
             margin-bottom: 36px;
         }
 
@@ -122,7 +122,7 @@
         }
 
         .screenshots-scroll::-webkit-scrollbar-thumb {
-            background: #ccc;
+            background: #44403C;
             border-radius: 3px;
         }
 
@@ -134,7 +134,7 @@
         .screenshot-item img {
             height: 480px;
             border-radius: 16px;
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
         }
 
         /* Features */
@@ -147,7 +147,7 @@
         .features h2 {
             text-align: center;
             font-size: 1.8rem;
-            color: #5B4CDB;
+            color: #FBBF24;
             margin-bottom: 48px;
         }
 
@@ -158,16 +158,18 @@
         }
 
         .feature-card {
-            background: white;
+            background: #292524;
+            border: 1px solid #44403C;
             border-radius: 16px;
             padding: 28px;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
         .feature-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            border-color: #FBBF24;
         }
 
         .feature-icon {
@@ -178,19 +180,19 @@
         .feature-card h3 {
             font-size: 1.15rem;
             margin-bottom: 8px;
-            color: #2D2A26;
+            color: #FEF3C7;
         }
 
         .feature-card p {
             font-size: 0.95rem;
-            color: #666;
+            color: #A8A29E;
             line-height: 1.5;
         }
 
         /* Pro */
         .pro-section {
-            background: linear-gradient(135deg, #292524 0%, #3D3835 100%);
-            color: white;
+            background: linear-gradient(135deg, #0C0A09 0%, #1C1917 100%);
+            color: #FEF3C7;
             padding: 80px 24px;
             text-align: center;
         }
@@ -201,7 +203,7 @@
         }
 
         .pro-section h2 span {
-            color: #FFD93D;
+            color: #FBBF24;
         }
 
         .pro-section .subtitle {
@@ -220,31 +222,32 @@
         }
 
         .pro-tag {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px solid rgba(251, 191, 36, 0.25);
             border-radius: 100px;
             padding: 10px 20px;
             font-size: 0.95rem;
-            backdrop-filter: blur(4px);
+            color: #FCD34D;
         }
 
         /* Footer */
         footer {
-            background: #2D2A26;
-            color: rgba(255, 255, 255, 0.6);
+            background: #0C0A09;
+            color: #A8A29E;
             padding: 40px 24px;
             text-align: center;
             font-size: 0.9rem;
+            border-top: 1px solid #44403C;
         }
 
         footer a {
-            color: rgba(255, 255, 255, 0.8);
+            color: #D6D3D1;
             text-decoration: none;
             transition: color 0.2s;
         }
 
         footer a:hover {
-            color: #FFD93D;
+            color: #FBBF24;
         }
 
         .footer-links {
