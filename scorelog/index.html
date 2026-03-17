@@ -102,15 +102,27 @@
             margin-bottom: 36px;
         }
 
+        .screenshots-wrapper {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
         .screenshots-scroll {
             display: flex;
             gap: 20px;
             overflow-x: auto;
             scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
             padding: 0 24px 20px;
-            max-width: 1200px;
-            margin: 0 auto;
             -webkit-overflow-scrolling: touch;
+            cursor: grab;
+        }
+
+        .screenshots-scroll.grabbing {
+            cursor: grabbing;
+            scroll-behavior: auto;
+            scroll-snap-type: none;
         }
 
         .screenshots-scroll::-webkit-scrollbar {
@@ -126,6 +138,33 @@
             border-radius: 3px;
         }
 
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 1px solid #44403C;
+            background: #292524;
+            color: #FBBF24;
+            font-size: 1.2rem;
+            cursor: pointer;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s, border-color 0.2s;
+        }
+
+        .carousel-btn:hover {
+            background: #3A3736;
+            border-color: #FBBF24;
+        }
+
+        .carousel-btn.prev { left: -8px; }
+        .carousel-btn.next { right: -8px; }
+
         .screenshot-item {
             flex: 0 0 auto;
             scroll-snap-align: center;
@@ -135,6 +174,7 @@
             height: 480px;
             border-radius: 16px;
             box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+            pointer-events: none;
         }
 
         /* Features */
@@ -280,6 +320,10 @@
                 grid-template-columns: 1fr;
                 gap: 20px;
             }
+
+            .carousel-btn {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -300,14 +344,18 @@
     <!-- Screenshots -->
     <section class="screenshots-section">
         <h2>See it in action</h2>
-        <div class="screenshots-scroll">
-            <div class="screenshot-item"><img src="assets/1-score-any-game.png" alt="Score any game" loading="lazy"></div>
-            <div class="screenshot-item"><img src="assets/2-game-modes.png" alt="6 game modes" loading="lazy"></div>
-            <div class="screenshot-item"><img src="assets/3-smart-scorecards.png" alt="Smart scorecards" loading="lazy"></div>
-            <div class="screenshot-item"><img src="assets/4-tournaments.png" alt="Tournaments" loading="lazy"></div>
-            <div class="screenshot-item"><img src="assets/6-play-together.png" alt="Live multiplayer" loading="lazy"></div>
-            <div class="screenshot-item"><img src="assets/7-themes.png" alt="Themes" loading="lazy"></div>
-            <div class="screenshot-item"><img src="assets/8-player-stats.png" alt="Player stats" loading="lazy"></div>
+        <div class="screenshots-wrapper">
+            <button class="carousel-btn prev" aria-label="Previous">&#8249;</button>
+            <div class="screenshots-scroll" id="screenshotsScroll">
+                <div class="screenshot-item"><img src="assets/1-score-any-game.png" alt="Score any game" loading="lazy"></div>
+                <div class="screenshot-item"><img src="assets/2-game-modes.png" alt="6 game modes" loading="lazy"></div>
+                <div class="screenshot-item"><img src="assets/3-smart-scorecards.png" alt="Smart scorecards" loading="lazy"></div>
+                <div class="screenshot-item"><img src="assets/4-tournaments.png" alt="Tournaments" loading="lazy"></div>
+                <div class="screenshot-item"><img src="assets/6-play-together.png" alt="Live multiplayer" loading="lazy"></div>
+                <div class="screenshot-item"><img src="assets/7-themes.png" alt="Themes" loading="lazy"></div>
+                <div class="screenshot-item"><img src="assets/8-player-stats.png" alt="Player stats" loading="lazy"></div>
+            </div>
+            <button class="carousel-btn next" aria-label="Next">&#8250;</button>
         </div>
     </section>
 
@@ -372,5 +420,43 @@
         <p>&copy; 2026 Bramzz. All rights reserved.</p>
     </footer>
 
+    <script>
+    (function() {
+        var scroll = document.getElementById('screenshotsScroll');
+        var prevBtn = document.querySelector('.carousel-btn.prev');
+        var nextBtn = document.querySelector('.carousel-btn.next');
+        var scrollAmount = 260;
+
+        prevBtn.addEventListener('click', function() {
+            scroll.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+        });
+        nextBtn.addEventListener('click', function() {
+            scroll.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        });
+
+        // Drag to scroll
+        var isDown = false, startX, scrollLeft;
+        scroll.addEventListener('mousedown', function(e) {
+            isDown = true;
+            scroll.classList.add('grabbing');
+            startX = e.pageX - scroll.offsetLeft;
+            scrollLeft = scroll.scrollLeft;
+        });
+        scroll.addEventListener('mouseleave', function() {
+            isDown = false;
+            scroll.classList.remove('grabbing');
+        });
+        scroll.addEventListener('mouseup', function() {
+            isDown = false;
+            scroll.classList.remove('grabbing');
+        });
+        scroll.addEventListener('mousemove', function(e) {
+            if (!isDown) return;
+            e.preventDefault();
+            var x = e.pageX - scroll.offsetLeft;
+            scroll.scrollLeft = scrollLeft - (x - startX);
+        });
+    })();
+    </script>
 </body>
 </html>
