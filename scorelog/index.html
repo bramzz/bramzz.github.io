@@ -328,20 +328,8 @@
         ════════════════════════════════════════ */
         .screenshots {
             position: relative;
-            padding: 120px 0;
+            padding: 0 0 120px;
             background: var(--bg-deep);
-        }
-
-        /* Diagonal divider top */
-        .screenshots::before {
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: 0;
-            right: 0;
-            height: 80px;
-            background: var(--bg);
-            clip-path: polygon(0 0, 100% 0, 100% 20%, 0 100%);
         }
 
         .section-header {
@@ -365,6 +353,163 @@
             font-weight: 800;
             letter-spacing: -1.5px;
             line-height: 1.1;
+        }
+
+        /* ════════════════════════════════════════
+           VIDEO
+        ════════════════════════════════════════ */
+        .video-section {
+            position: relative;
+            padding: 100px 24px 120px;
+            background: var(--bg-deep);
+            overflow: hidden;
+        }
+
+        .video-section::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: var(--bg);
+            clip-path: polygon(0 0, 100% 0, 100% 20%, 0 100%);
+        }
+
+        .video-container {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+            border-radius: 20px;
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow: 0 32px 80px -16px rgba(0,0,0,0.7);
+        }
+
+        /* Amber glow behind video */
+        .video-glow {
+            position: absolute;
+            inset: -60px;
+            background: radial-gradient(ellipse at center, rgba(251, 191, 36, 0.08), transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+            border-radius: 30px;
+        }
+
+        .video-thumbnail {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: var(--card);
+            overflow: hidden;
+        }
+
+        .video-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.6s cubic-bezier(0.16,1,0.3,1), filter 0.6s;
+        }
+
+        .video-container:hover .video-thumbnail img {
+            transform: scale(1.03);
+            filter: brightness(0.7);
+        }
+
+        /* Dark overlay */
+        .video-thumbnail::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.3);
+            transition: background 0.4s;
+        }
+
+        .video-container:hover .video-thumbnail::after {
+            background: rgba(0,0,0,0.5);
+        }
+
+        /* Play button */
+        .video-play {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 32px rgba(251, 191, 36, 0.4);
+            transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s;
+        }
+
+        .video-container:hover .video-play {
+            transform: translate(-50%, -50%) scale(1.1);
+            box-shadow: 0 12px 48px rgba(251, 191, 36, 0.5);
+        }
+
+        .video-play svg {
+            width: 28px;
+            height: 28px;
+            fill: var(--bg-deep);
+            margin-left: 3px;
+        }
+
+        /* Pulse ring */
+        .video-play::after {
+            content: '';
+            position: absolute;
+            inset: -8px;
+            border-radius: 50%;
+            border: 2px solid var(--primary);
+            opacity: 0.4;
+            animation: playPulse 2s ease-out infinite;
+        }
+
+        @keyframes playPulse {
+            0% { transform: scale(1); opacity: 0.4; }
+            100% { transform: scale(1.4); opacity: 0; }
+        }
+
+        .video-caption {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: rgba(255,255,255,0.8);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        /* Iframe replaces thumbnail on click */
+        .video-container.playing .video-thumbnail,
+        .video-container.playing .video-play,
+        .video-container.playing .video-caption {
+            display: none;
+        }
+
+        .video-container iframe {
+            width: 100%;
+            aspect-ratio: 16/9;
+            border: 0;
+            display: block;
+        }
+
+        @media (max-width: 640px) {
+            .video-section { padding: 64px 16px 80px; }
+            .video-section::before { height: 40px; }
+            .video-play { width: 64px; height: 64px; }
+            .video-play svg { width: 22px; height: 22px; }
+            .video-caption { font-size: 0.75rem; bottom: 14px; }
         }
 
         .masonry {
@@ -717,8 +862,7 @@
             .hero-glow { width: 350px; height: 350px; }
             .scroll-hint { display: none; }
 
-            .screenshots { padding: 64px 0; }
-            .screenshots::before { height: 40px; }
+            .screenshots { padding: 0 0 64px; }
             .masonry { grid-template-columns: 1fr; gap: 16px; padding: 0 20px; }
             .masonry-col { gap: 16px; }
             .masonry-col:nth-child(2) { padding-top: 0; }
@@ -777,6 +921,24 @@
     <div class="scroll-hint">
         <div class="scroll-line"></div>
         scroll
+    </div>
+</section>
+
+<!-- ════ Video ════ -->
+<section class="video-section">
+    <div class="section-header r">
+        <div class="section-tag">Watch</div>
+        <h2 class="section-title">See it in 60 seconds</h2>
+    </div>
+    <div class="video-container r" id="videoContainer">
+        <div class="video-glow"></div>
+        <div class="video-thumbnail">
+            <img src="https://img.youtube.com/vi/3QU38saTMys/hqdefault.jpg" alt="ScoreLog promo video">
+        </div>
+        <div class="video-play">
+            <svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>
+        </div>
+        <span class="video-caption">Watch the promo</span>
     </div>
 </section>
 
@@ -943,6 +1105,19 @@
         });
     }, { threshold: 0.12 });
     els.forEach(function(el) { obs.observe(el); });
+
+    /* ── Video click-to-play ── */
+    var vc = document.getElementById('videoContainer');
+    vc.addEventListener('click', function() {
+        if (vc.classList.contains('playing')) return;
+        vc.classList.add('playing');
+        var iframe = document.createElement('iframe');
+        iframe.src = 'https://www.youtube.com/embed/3QU38saTMys?autoplay=1&rel=0&origin=https://bramzz.github.io';
+        iframe.allow = 'autoplay; encrypted-media; fullscreen';
+        iframe.setAttribute('allowfullscreen', '');
+        iframe.setAttribute('frameborder', '0');
+        vc.appendChild(iframe);
+    });
 
 })();
 </script>
