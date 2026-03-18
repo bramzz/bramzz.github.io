@@ -1112,10 +1112,11 @@
         if (vc.classList.contains('playing')) return;
         vc.classList.add('playing');
         var iframe = document.createElement('iframe');
-        iframe.src = 'https://www.youtube.com/embed/3QU38saTMys?autoplay=1&rel=0&origin=https://bramzz.github.io';
+        iframe.src = 'https://www.youtube.com/embed/3QU38saTMys?autoplay=1&rel=0&vq=hd2160';
         iframe.allow = 'autoplay; encrypted-media; fullscreen';
         iframe.setAttribute('allowfullscreen', '');
         iframe.setAttribute('frameborder', '0');
+        iframe.setAttribute('referrerpolicy', 'no-referrer-when-downgrade');
         vc.appendChild(iframe);
     });
 
